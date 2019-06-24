@@ -1,6 +1,6 @@
 # StephanDeeAppReact
 
-My Frontend - React App
+My Frontend - React Application
 
 # React Information
 
