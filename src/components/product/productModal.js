@@ -25,15 +25,17 @@ export default class ProductModal extends React.Component {
     this.toggle = this.toggle.bind(this);
   }
 
-  componentWillReceiveProps(props) {
-    this.setState({ modal: props.modal });
+  componentWillReceiveProps(nextProps) {
+    this.setState({ modal: nextProps.modal });
   }
 
-  toggle() {
+  async toggle() {
     console.log("i've been looking for freedom");
-    this.setState(prevState => ({
+    await this.setState(prevState => ({
       modal: !prevState.modal
     }));
+
+    this.props.handleToUpdate();
   }
 
   inputHandler(element) {
@@ -59,17 +61,9 @@ export default class ProductModal extends React.Component {
     }
   }
 
-  handleSave() {
-    const item = this.state;
-    this.props.saveModalDetails(item);
-  }
-
   render() {
     return (
       <div>
-        <Button color="danger" onClick={this.toggle}>
-          {this.props.buttonLabel}
-        </Button>
         <Modal
           isOpen={this.state.modal}
           toggle={this.toggle}
@@ -101,7 +95,7 @@ export default class ProductModal extends React.Component {
           <ModalFooter>
             <Button color="primary" onClick={this.toggle}>
               Speichern
-            </Button>{" "}
+            </Button>
             <Button color="secondary" onClick={this.toggle}>
               Abbrechen
             </Button>

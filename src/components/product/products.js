@@ -39,6 +39,7 @@ export default class Products extends React.Component {
     };
 
     this.updateProduct = this.updateProduct.bind(this);
+    this.handleToUpdate = this.handleToUpdate.bind(this);
   }
 
   /**
@@ -79,6 +80,12 @@ export default class Products extends React.Component {
 
   toggleModal() {
     this.setState({ modal: true });
+    console.log("openModal");
+  }
+
+  handleToUpdate() {
+    this.setState({ modal: false });
+    console.log("handleUpdate");
   }
 
   async createProduct(name, price, description) {
@@ -174,6 +181,7 @@ export default class Products extends React.Component {
         </ListGroupItem>
       );
     });
+    let handleToUpdate = this.handleToUpdate;
     return (
       <div className="Products">
         <FormGroup>
@@ -213,7 +221,10 @@ export default class Products extends React.Component {
           Produkt hinzufügen
         </Button>
         <ListGroup>{productList}</ListGroup>
-        <ProductModal modal={this.state.modal} />
+        <ProductModal
+          modal={this.state.modal}
+          handleToUpdate={() => handleToUpdate()}
+        />
       </div>
     );
   }
