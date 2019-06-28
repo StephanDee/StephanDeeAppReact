@@ -27,23 +27,18 @@ export default class Products extends React.Component {
   constructor(props) {
     super(props);
 
-    this.replaceModalItem = this.replaceModalItem.bind(this);
-    this.updateProduct = this.updateProduct.bind(this);
-
     this.state = {
-      products: [{
-        _id: 123,
-        name: '123',
-        description: '123',
-        price: 'test'
-      }],
+      products: [],
       newProduct: {
         name: "",
         description: "",
         price: ""
       },
+      modal: false,
       modalItemIndex: 0
     };
+
+    this.updateProduct = this.updateProduct.bind(this);
   }
 
   /**
@@ -82,9 +77,8 @@ export default class Products extends React.Component {
     }
   }
 
-  replaceModalItem(index) {
-    console.log(index);
-    this.setState({ modalItemIndex: index });
+  toggleModal() {
+    this.setState({ modal: true });
   }
 
   async createProduct(name, price, description) {
@@ -146,7 +140,7 @@ export default class Products extends React.Component {
   }
 
   render() {
-    let productList = this.state.products.map((product, index) => {
+    let productList = this.state.products.map(product => {
       return (
         <ListGroupItem key={product._id}>
           <Card>
@@ -156,7 +150,9 @@ export default class Products extends React.Component {
               size="sm"
               data-toggle="modal"
               data-target="#exampleModal"
-              onClick={() => this.replaceModalItem(index)}
+              onClick={() => {
+                this.toggleModal();
+              }}
             >
               Editieren
             </Button>
@@ -178,7 +174,6 @@ export default class Products extends React.Component {
         </ListGroupItem>
       );
     });
-    let modalData = this.state.products[this.state.modalItemIndex];
     return (
       <div className="Products">
         <FormGroup>
@@ -218,13 +213,7 @@ export default class Products extends React.Component {
           Produkt hinzufügen
         </Button>
         <ListGroup>{productList}</ListGroup>
-        <ProductModal
-          id={modalData._id}
-          name={modalData.name}
-          description={modalData.description}
-          price={modalData.price}
-          updateProduct={this.updateProduct}
-        />
+        <ProductModal modal={this.state.modal} />
       </div>
     );
   }

@@ -1,28 +1,44 @@
-import React, { Component } from "react";
+import React from "react";
+import {
+  Button,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Label,
+  Input,
+  FormGroup
+} from "reactstrap";
 
-class ProductModal extends Component {
+export default class ProductModal extends React.Component {
   constructor(props) {
     super(props);
-    this.handleSave = this.handleSave.bind(this);
+
     this.state = {
+      modal: false,
       id: "",
       name: "",
       description: "",
       price: ""
     };
+
+    this.toggle = this.toggle.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      id: nextProps.id,
-      name: nextProps.name,
-      description: nextProps.description,
-      price: nextProps.price
-    });
+  componentWillReceiveProps(props) {
+    this.setState({ modal: props.modal });
+  }
+
+  toggle() {
+    console.log("i've been looking for freedom");
+    this.setState(prevState => ({
+      modal: !prevState.modal
+    }));
   }
 
   inputHandler(element) {
     let value = element.target.value;
+
     switch (element.target.id) {
       case "name": {
         this.setState({ name: value });
@@ -50,77 +66,48 @@ class ProductModal extends Component {
 
   render() {
     return (
-      <div
-        className="modal fade"
-        id="exampleModal"
-        tabIndex="-1"
-        role="dialog"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog" role="document">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="exampleModalLabel">
-                Edit Jewel
-              </h5>
-              <button
-                type="button"
-                className="close"
-                data-dismiss="modal"
-                aria-label="Close"
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div className="modal-body">
-              <p>
-                <span className="modal-lable">Name:</span>
-                <input
-                  value={this.state.name}
-                  onChange={element => this.inputHandler(element)}
-                />
-              </p>
-              <p>
-                <span className="modal-lable">Beschreibung:</span>
-                <input
-                  value={this.state.description}
-                  onChange={element => this.inputHandler(element)}
-                />
-              </p>
-              <p>
-                <span className="modal-lable">Preis:</span>
-                <input
-                  type="number"
-                  value={this.state.price}
-                  onChange={element => this.inputHandler(element)}
-                />
-              </p>
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-dismiss="modal"
-              >
-                Close
-              </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                data-dismiss="modal"
-                onClick={() => {
-                  this.handleSave();
-                }}
-              >
-                Save changes
-              </button>
-            </div>
-          </div>
-        </div>
+      <div>
+        <Button color="danger" onClick={this.toggle}>
+          {this.props.buttonLabel}
+        </Button>
+        <Modal
+          isOpen={this.state.modal}
+          toggle={this.toggle}
+          className={this.props.className}
+        >
+          <ModalHeader toggle={this.toggle}>Name</ModalHeader>
+          <ModalBody>
+            <FormGroup>
+              <Label for="name">Name</Label>
+              <Input
+                id="name"
+                type="text"
+                onChange={element => this.inputHandler(element)}
+              />
+              <Label for="description">Beschreibung</Label>
+              <Input
+                id="description"
+                type="text"
+                onChange={element => this.inputHandler(element)}
+              />
+              <Label for="price">Preis</Label>
+              <Input
+                id="price"
+                type="number"
+                onChange={element => this.inputHandler(element)}
+              />
+            </FormGroup>
+          </ModalBody>
+          <ModalFooter>
+            <Button color="primary" onClick={this.toggle}>
+              Speichern
+            </Button>{" "}
+            <Button color="secondary" onClick={this.toggle}>
+              Abbrechen
+            </Button>
+          </ModalFooter>
+        </Modal>
       </div>
     );
   }
 }
-
-export default ProductModal;
