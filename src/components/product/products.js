@@ -1,5 +1,5 @@
 import React from "react";
-import API from "../api/api";
+import API from "../../api/api";
 import {
   Card,
   CardBody,
@@ -13,6 +13,7 @@ import {
   Input,
   FormGroup
 } from "reactstrap";
+import ProductModal from "./productModal";
 
 /**
  * Handles the products.
@@ -25,13 +26,23 @@ export default class Products extends React.Component {
    */
   constructor(props) {
     super(props);
+
+    this.replaceModalItem = this.replaceModalItem.bind(this);
+    this.updateProduct = this.updateProduct.bind(this);
+
     this.state = {
-      products: [],
+      products: [{
+        _id: 123,
+        name: '123',
+        description: '123',
+        price: 'test'
+      }],
       newProduct: {
         name: "",
         description: "",
         price: ""
-      }
+      },
+      modalItemIndex: 0
     };
   }
 
@@ -40,9 +51,40 @@ export default class Products extends React.Component {
    */
   componentDidMount() {
     API.get(`${this.props.productsRoute}`).then(res => {
-      const products = res.data;
-      this.setState({ products });
+      this.setState({ products: res.data });
     });
+  }
+
+  inputHandler(element) {
+    let tempNewProduct = this.state.newProduct;
+    const value = element.target.value;
+
+    switch (element.target.id) {
+      case "name": {
+        tempNewProduct.name = value;
+        this.setState({ newProduct: tempNewProduct });
+        break;
+      }
+      case "description": {
+        tempNewProduct.description = value;
+        this.setState({ newProduct: tempNewProduct });
+        break;
+      }
+      case "price": {
+        tempNewProduct.price = value;
+        this.setState({ newProduct: tempNewProduct });
+        break;
+      }
+      default: {
+        console.log("Das Inputfeld konnte nicht identifiziert werden.");
+        break;
+      }
+    }
+  }
+
+  replaceModalItem(index) {
+    console.log(index);
+    this.setState({ modalItemIndex: index });
   }
 
   async createProduct(name, price, description) {
@@ -53,33 +95,36 @@ export default class Products extends React.Component {
         price: price
       };
       await API.post(`${this.props.productsRoute}`, product).then(res => {
-        let { products } = this.state;
-        let { newProduct } = this.state;
+        let tempProducts = this.state.products;
+        let tempNewProduct = this.state.newProduct;
 
-        products.push(res.data);
-        this.setState({ products });
+        tempProducts.push(res.data);
+        this.setState({ products: tempProducts });
 
-        newProduct.name = "";
-        newProduct.description = "";
-        newProduct.price = "";
-        this.setState({ newProduct });
+        tempNewProduct.name = "";
+        tempNewProduct.description = "";
+        tempNewProduct.price = "";
+        this.setState({ newProduct: tempNewProduct });
       });
     } else {
       console.log("Name oder Preis fehlt.");
     }
   }
 
-  async updateProduct(id) {
-    let product = {
-      name: "test 2",
-      description: "test 2",
-      price: "3"
-    };
-    await API.put(`${this.props.productsRoute}${id}`, product).then(res => {
-      console.log(res);
-      let index = this.state.products.findIndex(product => product._id === id);
+  async updateProduct(updatedProduct) {
+    await API.put(
+      `${this.props.productsRoute}${updatedProduct.id}`,
+      updatedProduct
+    ).then(res => {
+      let index = this.state.products.findIndex(
+        product => product._id === updatedProduct.id
+      );
+
       if (index > -1) {
-        this.state.products.splice(index, 0);
+        let tempProducts = this.state.products;
+
+        tempProducts.splice(index, 0);
+        this.setState({ products: tempProducts });
       } else {
         console.log("Produkt existiert nicht.");
       }
@@ -89,22 +134,30 @@ export default class Products extends React.Component {
   async removeProduct(id) {
     await API.delete(`${this.props.productsRoute}${id}`);
     let index = this.state.products.findIndex(product => product._id === id);
+
     if (index > -1) {
-      let { products } = this.state;
-      products.splice(index, 1);
-      this.setState({ products });
+      let tempProducts = this.state.products;
+
+      tempProducts.splice(index, 1);
+      this.setState({ products: tempProducts });
     } else {
       console.log("Produkt existiert nicht.");
     }
   }
 
   render() {
-    let productList = this.state.products.map(product => {
+    let productList = this.state.products.map((product, index) => {
       return (
         <ListGroupItem key={product._id}>
           <Card>
             <CardTitle>{product.name}</CardTitle>
-            <Button color="success" size="sm">
+            <Button
+              color="success"
+              size="sm"
+              data-toggle="modal"
+              data-target="#exampleModal"
+              onClick={() => this.replaceModalItem(index)}
+            >
               Editieren
             </Button>
             <Button
@@ -125,6 +178,7 @@ export default class Products extends React.Component {
         </ListGroupItem>
       );
     });
+    let modalData = this.state.products[this.state.modalItemIndex];
     return (
       <div className="Products">
         <FormGroup>
@@ -133,33 +187,21 @@ export default class Products extends React.Component {
             id="name"
             type="text"
             value={this.state.newProduct.name}
-            onChange={element => {
-              let { newProduct } = this.state;
-              newProduct.name = element.target.value;
-              this.setState({ newProduct });
-            }}
+            onChange={element => this.inputHandler(element)}
           />
           <Label for="description">Beschreibung</Label>
           <Input
             id="description"
             type="text"
             value={this.state.newProduct.description}
-            onChange={element => {
-              let { newProduct } = this.state;
-              newProduct.description = element.target.value;
-              this.setState({ newProduct });
-            }}
+            onChange={element => this.inputHandler(element)}
           />
           <Label for="price">Preis</Label>
           <Input
             id="price"
             type="number"
             value={this.state.newProduct.price}
-            onChange={element => {
-              let { newProduct } = this.state;
-              newProduct.price = element.target.value;
-              this.setState({ newProduct });
-            }}
+            onChange={element => this.inputHandler(element)}
           />
         </FormGroup>
         <Button
@@ -176,6 +218,13 @@ export default class Products extends React.Component {
           Produkt hinzufügen
         </Button>
         <ListGroup>{productList}</ListGroup>
+        <ProductModal
+          id={modalData._id}
+          name={modalData.name}
+          description={modalData.description}
+          price={modalData.price}
+          updateProduct={this.updateProduct}
+        />
       </div>
     );
   }
