@@ -35,11 +35,16 @@ export default class Products extends React.Component {
         price: ""
       },
       modal: false,
-      modalItemIndex: 0
+      modalProduct: {
+        id: "",
+        name: "",
+        description: "",
+        price: ""
+      }
     };
 
     this.updateProduct = this.updateProduct.bind(this);
-    this.handleToUpdate = this.handleToUpdate.bind(this);
+    this.afterModalClosed = this.afterModalClosed.bind(this);
   }
 
   /**
@@ -78,14 +83,28 @@ export default class Products extends React.Component {
     }
   }
 
-  toggleModal() {
-    this.setState({ modal: true });
-    console.log("openModal");
+  toggleModal(id, name, description, price) {
+    let tempModalProduct = this.state.modalProduct;
+    tempModalProduct.id = id;
+    tempModalProduct.name = name;
+    tempModalProduct.description = description;
+    tempModalProduct.price = price;
+    this.setState({
+      modal: true,
+      modalProduct: tempModalProduct
+    });
   }
 
-  handleToUpdate() {
-    this.setState({ modal: false });
-    console.log("handleUpdate");
+  afterModalClosed() {
+    let tempModalProduct = this.state.modalProduct;
+    tempModalProduct.name = "";
+    tempModalProduct.description = "";
+    tempModalProduct.price = "";
+
+    this.setState({
+      modal: false,
+      modalProduct: tempModalProduct
+    });
   }
 
   async createProduct(name, price, description) {
@@ -100,12 +119,13 @@ export default class Products extends React.Component {
         let tempNewProduct = this.state.newProduct;
 
         tempProducts.push(res.data);
-        this.setState({ products: tempProducts });
-
         tempNewProduct.name = "";
         tempNewProduct.description = "";
         tempNewProduct.price = "";
-        this.setState({ newProduct: tempNewProduct });
+        this.setState({
+          products: tempProducts,
+          newProduct: tempNewProduct
+        });
       });
     } else {
       console.log("Name oder Preis fehlt.");
@@ -147,6 +167,7 @@ export default class Products extends React.Component {
   }
 
   render() {
+    let afterModalClosed = this.afterModalClosed;
     let productList = this.state.products.map(product => {
       return (
         <ListGroupItem key={product._id}>
@@ -158,7 +179,12 @@ export default class Products extends React.Component {
               data-toggle="modal"
               data-target="#exampleModal"
               onClick={() => {
-                this.toggleModal();
+                this.toggleModal(
+                  product._id,
+                  product.name,
+                  product.description,
+                  product.price
+                );
               }}
             >
               Editieren
@@ -181,7 +207,6 @@ export default class Products extends React.Component {
         </ListGroupItem>
       );
     });
-    let handleToUpdate = this.handleToUpdate;
     return (
       <div className="Products">
         <FormGroup>
@@ -223,7 +248,8 @@ export default class Products extends React.Component {
         <ListGroup>{productList}</ListGroup>
         <ProductModal
           modal={this.state.modal}
-          handleToUpdate={() => handleToUpdate()}
+          modalProduct={this.state.modalProduct}
+          afterModalClosed={() => afterModalClosed()}
         />
       </div>
     );

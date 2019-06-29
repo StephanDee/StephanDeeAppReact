@@ -16,17 +16,22 @@ export default class ProductModal extends React.Component {
 
     this.state = {
       modal: false,
-      id: "",
-      name: "",
-      description: "",
-      price: ""
+      product: {
+        id: "",
+        name: "",
+        description: "",
+        price: ""
+      }
     };
 
     this.toggle = this.toggle.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ modal: nextProps.modal });
+    this.setState({
+      modal: nextProps.modal,
+      product: nextProps.modalProduct
+    });
   }
 
   async toggle() {
@@ -35,23 +40,27 @@ export default class ProductModal extends React.Component {
       modal: !prevState.modal
     }));
 
-    this.props.handleToUpdate();
+    this.props.afterModalClosed();
   }
 
   inputHandler(element) {
+    let tempProduct = this.state.product;
     let value = element.target.value;
 
     switch (element.target.id) {
       case "name": {
-        this.setState({ name: value });
+        tempProduct.name = value;
+        this.setState({ product: tempProduct });
         break;
       }
       case "description": {
-        this.setState({ description: value });
+        tempProduct.description = value;
+        this.setState({ product: tempProduct });
         break;
       }
       case "price": {
-        this.setState({ price: value });
+        tempProduct.price = value;
+        this.setState({ product: tempProduct });
         break;
       }
       default: {
@@ -69,25 +78,28 @@ export default class ProductModal extends React.Component {
           toggle={this.toggle}
           className={this.props.className}
         >
-          <ModalHeader toggle={this.toggle}>Name</ModalHeader>
+          <ModalHeader toggle={this.toggle}>{this.state.product.name}</ModalHeader>
           <ModalBody>
             <FormGroup>
               <Label for="name">Name</Label>
               <Input
                 id="name"
                 type="text"
+                value={this.state.product.name}
                 onChange={element => this.inputHandler(element)}
               />
               <Label for="description">Beschreibung</Label>
               <Input
                 id="description"
                 type="text"
+                value={this.state.product.description}
                 onChange={element => this.inputHandler(element)}
               />
               <Label for="price">Preis</Label>
               <Input
                 id="price"
                 type="number"
+                value={this.state.product.price}
                 onChange={element => this.inputHandler(element)}
               />
             </FormGroup>
