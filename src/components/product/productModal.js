@@ -16,6 +16,7 @@ export default class ProductModal extends React.Component {
 
     this.state = {
       modal: false,
+      name: "",
       product: {
         id: "",
         name: "",
@@ -30,6 +31,7 @@ export default class ProductModal extends React.Component {
   componentWillReceiveProps(nextProps) {
     this.setState({
       modal: nextProps.modal,
+      name: nextProps.modalProduct.name,
       product: nextProps.modalProduct
     });
   }
@@ -78,7 +80,7 @@ export default class ProductModal extends React.Component {
           toggle={this.toggle}
           className={this.props.className}
         >
-          <ModalHeader toggle={this.toggle}>{this.state.product.name}</ModalHeader>
+          <ModalHeader toggle={this.toggle}>{this.state.name}</ModalHeader>
           <ModalBody>
             <FormGroup>
               <Label for="name">Name</Label>
