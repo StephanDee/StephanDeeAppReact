@@ -95,15 +95,27 @@ export default class Products extends React.Component {
     });
   }
 
-  afterModalClosed() {
+  async afterModalClosed() {
+    await this.updateProduct(this.state.modalProduct);
+    await this.resetModalProduct();
+    this.closeModalProduct();
+  }
+
+  resetModalProduct() {
     let tempModalProduct = this.state.modalProduct;
+    tempModalProduct.id = "";
     tempModalProduct.name = "";
     tempModalProduct.description = "";
     tempModalProduct.price = "";
 
     this.setState({
-      modal: false,
       modalProduct: tempModalProduct
+    });
+  }
+
+  closeModalProduct() {
+    this.setState({
+      modal: false
     });
   }
 
@@ -144,7 +156,7 @@ export default class Products extends React.Component {
       if (index > -1) {
         let tempProducts = this.state.products;
 
-        tempProducts.splice(index, 0);
+        tempProducts.splice(index, 1, res.data);
         this.setState({ products: tempProducts });
       } else {
         console.log("Produkt existiert nicht.");
@@ -214,20 +226,27 @@ export default class Products extends React.Component {
           <Input
             id="name"
             type="text"
+            required
             value={this.state.newProduct.name}
+            maxLength="30"
             onChange={element => this.inputHandler(element)}
           />
+          <p>{this.state.newProduct.name.length} / 30</p>
           <Label for="description">Beschreibung</Label>
           <Input
             id="description"
-            type="text"
+            type="textarea"
             value={this.state.newProduct.description}
+            maxLength="255"
+            rows="4"
             onChange={element => this.inputHandler(element)}
           />
+          <p>{this.state.newProduct.description.length} / 255</p>
           <Label for="price">Preis</Label>
           <Input
             id="price"
             type="number"
+            required
             value={this.state.newProduct.price}
             onChange={element => this.inputHandler(element)}
           />

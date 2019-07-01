@@ -36,13 +36,18 @@ export default class ProductModal extends React.Component {
     });
   }
 
-  async toggle() {
-    console.log("i've been looking for freedom");
-    await this.setState(prevState => ({
+  toggle() {
+    this.setState(prevState => ({
       modal: !prevState.modal
     }));
+  }
 
-    this.props.afterModalClosed();
+  onSaveButtonClicked(name, price) {
+    if (name && price) {
+      this.props.afterModalClosed();
+    } else {
+      console.log("Name oder Preis fehlt.");
+    }
   }
 
   inputHandler(element) {
@@ -87,27 +92,42 @@ export default class ProductModal extends React.Component {
               <Input
                 id="name"
                 type="text"
+                required
+                maxLength="30"
                 value={this.state.product.name}
                 onChange={element => this.inputHandler(element)}
               />
+              <p>{this.state.product.name.length} / 30</p>
               <Label for="description">Beschreibung</Label>
               <Input
                 id="description"
-                type="text"
+                type="textarea"
+                maxLength="255"
+                rows="4"
                 value={this.state.product.description}
                 onChange={element => this.inputHandler(element)}
               />
+              <p>{this.state.product.description.length} / 255</p>
               <Label for="price">Preis</Label>
               <Input
                 id="price"
                 type="number"
+                required
                 value={this.state.product.price}
                 onChange={element => this.inputHandler(element)}
               />
             </FormGroup>
           </ModalBody>
           <ModalFooter>
-            <Button color="primary" onClick={this.toggle}>
+            <Button
+              color="primary"
+              onClick={() =>
+                this.onSaveButtonClicked(
+                  this.state.product.name,
+                  this.state.product.price
+                )
+              }
+            >
               Speichern
             </Button>
             <Button color="secondary" onClick={this.toggle}>
