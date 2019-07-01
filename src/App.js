@@ -31,7 +31,7 @@ class App extends React.Component {
   render() {
     return (
       <div className="App container">
-        <h1>Produkt</h1>
+        <h1 className="text_color_dark_bg text_center">Produkt</h1>
         <Products />
       </div>
     );

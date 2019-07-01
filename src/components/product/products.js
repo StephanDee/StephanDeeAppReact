@@ -7,12 +7,12 @@ import {
   CardSubtitle,
   CardText,
   Button,
-  ListGroup,
-  ListGroupItem,
   Label,
   Input,
   FormGroup
 } from "reactstrap";
+import Icon from "@material-ui/core/Icon";
+import Fab from "@material-ui/core/Fab";
 import ProductModal from "./productModal";
 
 /**
@@ -43,8 +43,10 @@ export default class Products extends React.Component {
       }
     };
 
-    this.updateProduct = this.updateProduct.bind(this);
-    this.afterModalClosed = this.afterModalClosed.bind(this);
+    this.updateProductAndCloseModal = this.updateProductAndCloseModal.bind(
+      this
+    );
+    this.closeModal = this.closeModal.bind(this);
   }
 
   /**
@@ -95,10 +97,10 @@ export default class Products extends React.Component {
     });
   }
 
-  async afterModalClosed() {
+  async updateProductAndCloseModal() {
     await this.updateProduct(this.state.modalProduct);
     await this.resetModalProduct();
-    this.closeModalProduct();
+    this.closeModal();
   }
 
   resetModalProduct() {
@@ -113,7 +115,7 @@ export default class Products extends React.Component {
     });
   }
 
-  closeModalProduct() {
+  closeModal() {
     this.setState({
       modal: false
     });
@@ -179,96 +181,106 @@ export default class Products extends React.Component {
   }
 
   render() {
-    let afterModalClosed = this.afterModalClosed;
+    let closeModal = this.closeModal;
+    let updateProductAndCloseModal = this.updateProductAndCloseModal;
     let productList = this.state.products.map(product => {
       return (
-        <ListGroupItem key={product._id}>
-          <Card>
+        <Card key={product._id} className="padding_1 margin_top_bottom_1">
+          <div className="content_space_between">
             <CardTitle>{product.name}</CardTitle>
-            <Button
-              color="success"
-              size="sm"
-              data-toggle="modal"
-              data-target="#exampleModal"
-              onClick={() => {
-                this.toggleModal(
-                  product._id,
-                  product.name,
-                  product.description,
-                  product.price
-                );
-              }}
-            >
-              Editieren
-            </Button>
-            <Button
-              color="danger"
-              size="sm"
-              onClick={() => {
-                this.removeProduct(product._id);
-              }}
-            >
-              Löschen
-            </Button>
-            <CardBody>
-              <CardSubtitle>Beschreibung</CardSubtitle>
-              <CardText>{product.description}</CardText>
-              <CardText>Preis: {product.price} €</CardText>
-            </CardBody>
-          </Card>
-        </ListGroupItem>
+            <div className="content_flex_end">
+              <div className="margin_right_1">
+                <Fab
+                  color="primary"
+                  size="small"
+                  onClick={() => {
+                    this.toggleModal(
+                      product._id,
+                      product.name,
+                      product.description,
+                      product.price
+                    );
+                  }}
+                >
+                  <Icon>edit</Icon>
+                </Fab>
+              </div>
+              <Fab
+                color="secondary"
+                size="small"
+                onClick={() => {
+                  this.removeProduct(product._id);
+                }}
+              >
+                <Icon>delete</Icon>
+              </Fab>
+            </div>
+          </div>
+          <CardBody>
+            <CardSubtitle>Beschreibung</CardSubtitle>
+            <CardText>{product.description}</CardText>
+            <CardText className="content_flex_end">
+              Preis: {product.price} €
+            </CardText>
+          </CardBody>
+        </Card>
       );
     });
     return (
       <div className="Products">
-        <FormGroup>
-          <Label for="name">Name</Label>
-          <Input
-            id="name"
-            type="text"
-            required
-            value={this.state.newProduct.name}
-            maxLength="30"
-            onChange={element => this.inputHandler(element)}
-          />
-          <p>{this.state.newProduct.name.length} / 30</p>
-          <Label for="description">Beschreibung</Label>
-          <Input
-            id="description"
-            type="textarea"
-            value={this.state.newProduct.description}
-            maxLength="255"
-            rows="4"
-            onChange={element => this.inputHandler(element)}
-          />
-          <p>{this.state.newProduct.description.length} / 255</p>
-          <Label for="price">Preis</Label>
-          <Input
-            id="price"
-            type="number"
-            required
-            value={this.state.newProduct.price}
-            onChange={element => this.inputHandler(element)}
-          />
-        </FormGroup>
-        <Button
-          color="success"
-          size="sm"
-          onClick={() => {
-            this.createProduct(
-              this.state.newProduct.name,
-              this.state.newProduct.price,
-              this.state.newProduct.description
-            );
-          }}
-        >
-          Produkt hinzufügen
-        </Button>
-        <ListGroup>{productList}</ListGroup>
+        <Card className="padding_1 margin_top_bottom_1">
+          <FormGroup>
+            <Label for="name">Name</Label>
+            <Input
+              id="name"
+              type="text"
+              required
+              value={this.state.newProduct.name}
+              maxLength="30"
+              onChange={element => this.inputHandler(element)}
+            />
+            <p>{this.state.newProduct.name.length} / 30</p>
+            <Label for="description">Beschreibung</Label>
+            <Input
+              id="description"
+              type="textarea"
+              value={this.state.newProduct.description}
+              maxLength="255"
+              rows="4"
+              onChange={element => this.inputHandler(element)}
+            />
+            <p>{this.state.newProduct.description.length} / 255</p>
+            <Label for="price">Preis</Label>
+            <Input
+              id="price"
+              type="number"
+              required
+              value={this.state.newProduct.price}
+              onChange={element => this.inputHandler(element)}
+            />
+          </FormGroup>
+          <div className="content_flex_end">
+            <Button
+              color="success"
+              size="sm"
+              onClick={() => {
+                this.createProduct(
+                  this.state.newProduct.name,
+                  this.state.newProduct.price,
+                  this.state.newProduct.description
+                );
+              }}
+            >
+              Produkt hinzufügen
+            </Button>
+          </div>
+        </Card>
+        {productList}
         <ProductModal
           modal={this.state.modal}
           modalProduct={this.state.modalProduct}
-          afterModalClosed={() => afterModalClosed()}
+          closeModal={() => closeModal()}
+          updateProductAndCloseModal={() => updateProductAndCloseModal()}
         />
       </div>
     );

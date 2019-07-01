@@ -1,16 +1,77 @@
-/**
 body {
+  background: #232526;
+  /* fallback for old browsers */
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: -webkit-gradient(linear, left top, right top, from(#414345), to(#232526));
+  background: linear-gradient(to right, #414345, #232526);
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
-*/
+
+textarea {
+  resize: none;
+}
+
+.text_color_dark_bg {
+  color: #ffffff;
+}
+
+.text_center {
+  text-align: center;
+}
+
+.padding_1 {
+  padding: 8px 8px 8px 8px;
+}
+
+.margin_right_1 {
+  margin-right: 8px;
+}
+
+.margin_top_bottom_1 {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.margin_bottom_3 {
+  margin-bottom: 32px;
+}
+
+.container {
+  max-width: 600px;
+}
+
+.content_space_between {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.content_center {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.content_flex_end {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+}
 /*# sourceMappingURL=index.css.map */

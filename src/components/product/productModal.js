@@ -37,14 +37,15 @@ export default class ProductModal extends React.Component {
   }
 
   toggle() {
-    this.setState(prevState => ({
-      modal: !prevState.modal
-    }));
+    // this.setState(prevState => ({
+    //   modal: !prevState.modal
+    // }));
+    this.props.closeModal();
   }
 
   onSaveButtonClicked(name, price) {
     if (name && price) {
-      this.props.afterModalClosed();
+      this.props.updateProductAndCloseModal();
     } else {
       console.log("Name oder Preis fehlt.");
     }
@@ -120,7 +121,7 @@ export default class ProductModal extends React.Component {
           </ModalBody>
           <ModalFooter>
             <Button
-              color="primary"
+              color="success"
               onClick={() =>
                 this.onSaveButtonClicked(
                   this.state.product.name,
