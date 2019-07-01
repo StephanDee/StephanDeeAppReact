@@ -1,5 +1,4 @@
 import React from "react";
-import API from "../../api/api";
 import {
   Card,
   CardBody,
@@ -14,6 +13,7 @@ import {
 import Icon from "@material-ui/core/Icon";
 import Fab from "@material-ui/core/Fab";
 import ProductModal from "./productModal";
+import ProductAccess from "../../api/productAccess";
 
 /**
  * Handles the products.
@@ -22,7 +22,7 @@ export default class Products extends React.Component {
   /**
    * Constructor of products.
    *
-   * @param props productsRoute
+   * @param props The properties of products
    */
   constructor(props) {
     super(props);
@@ -43,6 +43,10 @@ export default class Products extends React.Component {
       }
     };
 
+    // get access to the CRUD methods for products
+    this.productAccess = new ProductAccess();
+
+    // bind functions to access those via the Child Component productModal
     this.updateProductAndCloseModal = this.updateProductAndCloseModal.bind(
       this
     );
@@ -53,11 +57,16 @@ export default class Products extends React.Component {
    * After the view has initialized.
    */
   componentDidMount() {
-    API.get(`${this.props.productsRoute}`).then(res => {
+    this.productAccess.getProducts().then(res => {
       this.setState({ products: res.data });
     });
   }
 
+  /**
+   * Handles all inputs.
+   *
+   * @param element the input element
+   */
   inputHandler(element) {
     let tempNewProduct = this.state.newProduct;
     const value = element.target.value;
@@ -85,24 +94,40 @@ export default class Products extends React.Component {
     }
   }
 
+  /**
+   * Opens the Modal via setState modal: true.
+   * Set props via modalProduct to send those to the Child Component productModal.
+   *
+   * @param id The product ID
+   * @param name The product name
+   * @param description The product description, optional
+   * @param price The product price
+   */
   toggleModal(id, name, description, price) {
     let tempModalProduct = this.state.modalProduct;
+
     tempModalProduct.id = id;
     tempModalProduct.name = name;
     tempModalProduct.description = description;
     tempModalProduct.price = price;
+
     this.setState({
       modal: true,
       modalProduct: tempModalProduct
     });
   }
 
+  /**
+   * Updates the updated product, resets the state of modalProduct and closes the modal.
+   */
   async updateProductAndCloseModal() {
     await this.updateProduct(this.state.modalProduct);
-    await this.resetModalProduct();
     this.closeModal();
   }
 
+  /**
+   * Resets the state of modalProduct.
+   */
   resetModalProduct() {
     let tempModalProduct = this.state.modalProduct;
     tempModalProduct.id = "";
@@ -115,42 +140,52 @@ export default class Products extends React.Component {
     });
   }
 
-  closeModal() {
+  /**
+   * Close modal via state modal: false and resets the state of modalProduct.
+   */
+  async closeModal() {
+    await this.resetModalProduct();
     this.setState({
       modal: false
     });
   }
 
+  /**
+   * Creates a new product and pushes it to the products list.
+   *
+   * @param name The product name
+   * @param price The product price
+   * @param description The product description, optional
+   */
   async createProduct(name, price, description) {
     if (name && price) {
-      let product = {
-        name: name,
-        description: description,
-        price: price
-      };
-      await API.post(`${this.props.productsRoute}`, product).then(res => {
-        let tempProducts = this.state.products;
-        let tempNewProduct = this.state.newProduct;
+      await this.productAccess
+        .createProduct(name, price, description)
+        .then(res => {
+          let tempProducts = this.state.products;
+          let tempNewProduct = this.state.newProduct;
 
-        tempProducts.push(res.data);
-        tempNewProduct.name = "";
-        tempNewProduct.description = "";
-        tempNewProduct.price = "";
-        this.setState({
-          products: tempProducts,
-          newProduct: tempNewProduct
+          tempProducts.push(res.data);
+          tempNewProduct.name = "";
+          tempNewProduct.description = "";
+          tempNewProduct.price = "";
+          this.setState({
+            products: tempProducts,
+            newProduct: tempNewProduct
+          });
         });
-      });
     } else {
       console.log("Name oder Preis fehlt.");
     }
   }
 
+  /**
+   * Updates the product, replaces the old product with the new product in the list.
+   *
+   * @param updatedProduct The updated product
+   */
   async updateProduct(updatedProduct) {
-    await API.put(
-      `${this.props.productsRoute}${updatedProduct.id}`,
-      updatedProduct
-    ).then(res => {
+    await this.productAccess.updateProduct(updatedProduct).then(res => {
       let index = this.state.products.findIndex(
         product => product._id === updatedProduct.id
       );
@@ -166,8 +201,13 @@ export default class Products extends React.Component {
     });
   }
 
+  /**
+   * Removes a product the specified ID.
+   *
+   * @param id The product ID
+   */
   async removeProduct(id) {
-    await API.delete(`${this.props.productsRoute}${id}`);
+    await this.productAccess.removeProduct(id);
     let index = this.state.products.findIndex(product => product._id === id);
 
     if (index > -1) {
@@ -286,7 +326,3 @@ export default class Products extends React.Component {
     );
   }
 }
-
-Products.defaultProps = {
-  productsRoute: "/products/"
-};

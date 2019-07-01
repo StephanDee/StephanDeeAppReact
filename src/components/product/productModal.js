@@ -10,7 +10,15 @@ import {
   FormGroup
 } from "reactstrap";
 
+/**
+ * The modal to update products.
+ */
 export default class ProductModal extends React.Component {
+  /**
+   * The constructor of ProductModal.
+   *
+   * @param props Product properties
+   */
   constructor(props) {
     super(props);
 
@@ -28,6 +36,11 @@ export default class ProductModal extends React.Component {
     this.toggle = this.toggle.bind(this);
   }
 
+  /**
+   * Will receive the specific props/product data and set those to be the default values to be updated.
+   *
+   * @param nextProps The next props aka the product attributes to be updated
+   */
   componentWillReceiveProps(nextProps) {
     this.setState({
       modal: nextProps.modal,
@@ -36,13 +49,19 @@ export default class ProductModal extends React.Component {
     });
   }
 
+  /**
+   * Closes the modal without any changes.
+   */
   toggle() {
-    // this.setState(prevState => ({
-    //   modal: !prevState.modal
-    // }));
     this.props.closeModal();
   }
 
+  /**
+   * Saves the update when name and price exists.
+   *
+   * @param name the product name
+   * @param price The product price
+   */
   onSaveButtonClicked(name, price) {
     if (name && price) {
       this.props.updateProductAndCloseModal();
@@ -51,6 +70,11 @@ export default class ProductModal extends React.Component {
     }
   }
 
+  /**
+   * Handles all inputs.
+   *
+   * @param element the input element
+   */
   inputHandler(element) {
     let tempProduct = this.state.product;
     let value = element.target.value;
